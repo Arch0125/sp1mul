@@ -1,25 +1,27 @@
 #![no_main]
 sp1_zkvm::entrypoint!(main);
-use tfhe::prelude::*;
-use tfhe::{generate_keys, set_server_key, ConfigBuilder, FheUint32, FheUint8};
-
+use paillier_rs::{arithmetic::paillier_add, decrypt::paillier_decrypt, encrypt::paillier_encrypt, keygen::paillier_keygen};
+use num_bigint::ToBigUint;
+use num_traits::cast::ToPrimitive;
 fn main() {
 
-    let a = sp1_zkvm::io::read::<u32>();
+    let bits = 64;
+    let (pubkey, privkey) = paillier_keygen(bits);
+
+    let a:u32 = sp1_zkvm::io::read::<u32>();
+    let b:u32 = sp1_zkvm::io::read::<u32>();
+
+    let m1 = a.to_biguint().unwrap();
+    let m2 = b.to_biguint().unwrap();
     
-    let config = ConfigBuilder::default().build();
+    let c1 = paillier_encrypt(&pubkey, &m1);
+    let c2 = paillier_encrypt(&pubkey, &m2);
+    
+    // Homomorphic addition: should yield m1 + m2.
+    let c_add = paillier_add(&c1, &c2, &pubkey);
+    let m_add = paillier_decrypt(&privkey, &pubkey, &c_add);
 
-    let (client_key, server_keys) = generate_keys(config);
+    let result = m_add.to_u32().unwrap();
 
-    let clear_a = 1344u32;
-    let clear_b = 5u32;
-
-    let encrypted_a = FheUint32::try_encrypt(clear_a, &client_key).unwrap();
-    let encrypted_b = FheUint32::try_encrypt(clear_b, &client_key).unwrap();
-
-    // set_server_key(server_keys);
-
-    // let encrypted_result: tfhe::FheUint<tfhe::FheUint32Id> = encrypted_a * encrypted_b;
-
-    sp1_zkvm::io::commit(&a);
+    sp1_zkvm::io::commit(&result);
 }

@@ -1,4 +1,4 @@
 [workspace]
-members = [ "paillier","program", "script"]
+members = [ "paillier_rs","program", "script"]
 
 resolver = "2"
