@@ -5,4 +5,3 @@ edition = "2021"
 
 [dependencies]
 sp1-sdk = "4.0.0"
-tfhe = { version = "0.9.1", features = ["boolean", "shortint", "integer"] }

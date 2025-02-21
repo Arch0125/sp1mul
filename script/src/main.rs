@@ -8,12 +8,14 @@ fn main() {
     utils::setup_logger();
 
     // Create an input stream and write '500' to it.
-    let a = 1u32;
+    let a: u32 = 1u32;
+    let b: u32 = 2;
 
     // The input stream that the program will read from using `sp1_zkvm::io::read`. Note that the
     // types of the elements in the input stream must match the types being read in the program.
     let mut stdin = SP1Stdin::new();
     stdin.write(&a);
+    stdin.write(&b);
 
     // Create a `ProverClient` method.
     let client = ProverClient::from_env();
