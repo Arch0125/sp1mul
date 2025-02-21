@@ -35,9 +35,8 @@ fn main() {
     //
     // Note that this output is read from values committed to in the program using
     // `sp1_zkvm::io::commit`.
-    let n = proof.public_values.read::<bool>();
-
-    println!("a: {}", n);
+    let n = proof.public_values.read::<u32>();
+    println!("output: {}", n);
 
     // Verify proof and public values
     client.verify(&proof, &vk).expect("verification failed");
