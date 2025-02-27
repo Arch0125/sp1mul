@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 rusqlite = { version = "0.28.0", features = ["functions"] }
+paillier_rs = { path = "../paillier_rs" }
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"

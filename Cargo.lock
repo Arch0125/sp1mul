@@ -1649,6 +1649,9 @@ dependencies = [
 name = "fhesql"
 version = "0.1.0"
 dependencies = [
+ "num-bigint 0.4.6",
+ "num-traits",
+ "paillier_rs",
  "rusqlite",
 ]
 
