@@ -1,7 +1,7 @@
-use paillier_rs::keygen::paillier_keygen;
+use paillier_rs::keygen::{paillier_keygen, PublicKey, PrivateKey};
 use paillier_rs::encrypt::paillier_encrypt;
 use paillier_rs::decrypt::paillier_decrypt;
-use paillier_rs::arithmetic::{paillier_add, paillier_scalar_mul, paillier_subtract, paillier_difference};
+use paillier_rs::arithmetic::{paillier_add, paillier_compare, paillier_difference, paillier_scalar_mul, paillier_subtract};
 use num_bigint::{BigUint, ToBigUint};
 
 fn main() {
@@ -39,4 +39,16 @@ fn main() {
     // Convenience difference (interpreted as signed).
     let diff = paillier_difference(&c1, &c2, &pubkey, &privkey);
     println!("Signed difference m1 - m2: {}", diff);
+
+    // Secure comparison using masked difference.
+    // Choose a random mask r that is larger than any expected |m1 - m2|.
+    // In this example, m1 = 42 and m2 = 17, so |m1 - m2| = 25.
+    // We choose r = 100.
+    let r = (2<<9).to_biguint().unwrap();
+    let comparison = paillier_compare(&c1, &c2, &pubkey, &privkey, &r);
+    if comparison {
+        println!("Secure comparison: m1 < m2");
+    } else {
+        println!("Secure comparison: m1 >= m2");
+    }
 }

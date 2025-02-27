@@ -1,4 +1,5 @@
 use crate::decrypt::paillier_decrypt;
+use crate::encrypt::paillier_encrypt; // Assumes an encryption function is provided.
 use crate::keygen::{PublicKey, PrivateKey};
 use num_bigint::{BigInt, BigUint, ToBigInt};
 use num_traits::One;
@@ -57,4 +58,42 @@ pub fn paillier_difference(
     } else {
         diff_mod.to_bigint().unwrap()
     }
+}
+
+/// Secure comparison of two encrypted values without decrypting the full difference.
+///
+/// Given ciphertexts `c1` and `c2` encrypting integers \(m\) and \(n\), and a random mask `r`
+/// (which must be chosen so that \(r\) is larger than any possible \(|m - n|\)),
+/// this function computes:
+///
+/// 1. The encrypted difference: \(Enc(m-n) = paillier\_subtract(c1, c2, pubkey)\).
+/// 2. A masked ciphertext: \(Enc((m-n)+r) = paillier\_add(Enc(m-n), Enc(r), pubkey)\).
+/// 3. Decrypts the masked ciphertext to obtain \(m - n + r\).
+///
+/// Since \(r\) exceeds \(|m-n|\), if the decrypted result is less than \(r\),
+/// then \(m-n\) is negative (i.e. \(m < n\)); otherwise, it is nonnegative.
+/// 
+/// Returns `true` if \(m < n\) (i.e. the sign of \(m-n\) is negative), and `false` otherwise.
+pub fn paillier_compare(
+    c1: &BigUint,
+    c2: &BigUint,
+    pubkey: &PublicKey,
+    privkey: &PrivateKey,
+    r: &BigUint,
+) -> bool {
+    // Step 1: Compute the encrypted difference Enc(m - n)
+    let c_diff = paillier_subtract(c1, c2, pubkey);
+
+    // Step 2: Encrypt the random mask r to obtain Enc(r)
+    let c_r = paillier_encrypt(&pubkey, r);
+
+    // Step 3: Compute the masked ciphertext Enc((m - n) + r)
+    let c_masked = paillier_add(&c_diff, &c_r, pubkey);
+
+    // Step 4: Decrypt the masked value to obtain (m - n + r)
+    let masked_value = paillier_decrypt(privkey, pubkey, &c_masked);
+
+    // Step 5: Compare the decrypted masked value with r.
+    // If masked_value < r, then m - n is negative (i.e. m < n).
+    masked_value < *r
 }
