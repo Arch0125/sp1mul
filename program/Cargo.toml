@@ -8,3 +8,4 @@ sp1-zkvm = "4.0.0"
 paillier_rs = { path = "../paillier_rs" }
 num-bigint = { version = "0.4", features = ["rand"] }
 num-traits = "0.2"
+cnn = { path = "../cnn"}
