@@ -1,4 +1,4 @@
 [workspace]
-members = [ "cnn", "fhesql", "paillier_rs","program", "script"]
+members = [ "cnn", "fhesql", "mnist", "paillier_rs","program", "script"]
 
 resolver = "2"

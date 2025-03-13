@@ -1,0 +1,11 @@
+[package]
+name = "mnist"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+paillier_rs = { path = "../paillier_rs" }
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+mnist = "0.6.0"
+rand = "0.8"
